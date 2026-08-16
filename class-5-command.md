@@ -1,5 +1,6 @@
 # MITRE ATT&CK-Based SOC Lab on Kali Linux
-### 20 Tools & Commands for Security Monitoring, Event Correlation, Log Management & Detection Strategy — Cyber Security Operations & SOC Management
+
+### 20 Tools & Commands for Security Monitoring, Event Correlation, Log Management & Detection Strategy
 
 This lab guide lists 20 open-source tools used on Kali Linux for building a MITRE ATT&CK-aligned SOC training lab. Tools are grouped by function: network monitoring/IDS, host log collection, SIEM/correlation, threat intel & mapping, and adversary emulation (used to safely generate detectable activity for exercises). Each entry includes install and core usage commands.
 
@@ -8,7 +9,9 @@ This lab guide lists 20 open-source tools used on Kali Linux for building a MITR
 ## A. Network Security Monitoring / IDS-IPS
 
 ### 1. Suricata
+
 Signature-based IDS/IPS/NSM engine; supports MITRE ATT&CK-tagged rulesets (ET Open, etc.).
+
 ```bash
 sudo apt install suricata -y
 sudo suricata-update
@@ -17,7 +20,9 @@ tail -f /var/log/suricata/eve.json | jq .
 ```
 
 ### 2. Zeek (Bro)
+
 Protocol-aware network traffic analyzer; generates rich connection/DNS/HTTP logs used for correlation.
+
 ```bash
 sudo apt install zeek -y
 sudo /opt/zeek/bin/zeekctl deploy
@@ -26,7 +31,9 @@ cat conn.log | zeek-cut id.orig_h id.resp_h proto
 ```
 
 ### 3. Snort
+
 Classic rule-based IDS; alternative/companion to Suricata for signature detection labs.
+
 ```bash
 sudo apt install snort -y
 sudo snort -A console -q -c /etc/snort/snort.conf -i eth0
@@ -34,7 +41,9 @@ sudo snort -T -c /etc/snort/snort.conf   # test config
 ```
 
 ### 4. tcpdump
+
 Raw packet capture for manual traffic inspection and evidence collection.
+
 ```bash
 sudo tcpdump -i eth0 -w capture.pcap
 sudo tcpdump -i eth0 port 445 -nn
@@ -42,7 +51,9 @@ tcpdump -r capture.pcap -A | less
 ```
 
 ### 5. Wireshark / tshark
+
 GUI and CLI packet analysis for deep-dive investigation of captured traffic.
+
 ```bash
 sudo apt install wireshark tshark -y
 tshark -i eth0 -Y "http.request" -T fields -e ip.src -e http.host
@@ -54,7 +65,9 @@ tshark -r capture.pcap -q -z conv,tcp
 ## B. Host-Based Logging / Endpoint Visibility
 
 ### 6. auditd
+
 Linux kernel audit framework; logs syscalls, file access, and privilege changes — maps to ATT&CK Linux techniques.
+
 ```bash
 sudo apt install auditd audispd-plugins -y
 sudo systemctl enable --now auditd
@@ -64,7 +77,9 @@ sudo aureport --summary
 ```
 
 ### 7. Sysmon for Linux
+
 Sysinternals Sysmon ported to Linux; detailed process/network/file event logging (mirrors Windows Sysmon).
+
 ```bash
 git clone https://github.com/Sysinternals/SysmonForLinux.git
 cd SysmonForLinux && ./build.sh
@@ -73,6 +88,7 @@ sudo journalctl -f -u sysmon
 ```
 
 ### 8. osquery
+
 SQL-based endpoint instrumentation; query running processes, users, network connections like a database.
 ```bash
 sudo apt install osquery -y
