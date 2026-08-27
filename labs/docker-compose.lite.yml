@@ -1,0 +1,55 @@
+# =========================================================
+# SOC Network Monitoring Stack — LITE (low-RAM) variant
+# Suricata + Zeek + ntopng only — no Elasticsearch/Kibana/filebeat
+# Target: VirtualBox VM with <2GB RAM
+# =========================================================
+# Usage:
+#   1. Edit INTERFACE below (default eth0) to your host's monitored NIC
+#   2. docker compose -f docker-compose.lite.yml up -d
+#   3. ntopng:      http://<host-ip>:3000  (user: admin / pass: admin)
+#   4. Suricata:    tail -f suricata/logs/eve.json | jq .
+#   5. Zeek:        zeek-cut < zeek/logs/current/conn.log
+# =========================================================
+
+services:
+  # ---- Network IDS / Signature Detection ----
+  suricata:
+    image: jasonish/suricata:latest
+    container_name: soc-suricata
+    network_mode: host # required to see live host traffic
+    cap_add:
+      - NET_ADMIN
+      - NET_RAW
+      - SYS_NICE
+    mem_limit: 300m
+    volumes:
+      - ./suricata/rules:/etc/suricata/rules
+      - ./suricata/logs:/var/log/suricata
+    command: -i ${INTERFACE:-eth0} -v
+    restart: unless-stopped
+
+  # ---- Protocol-Level Network Analyzer ----
+  zeek:
+    image: zeek/zeek:latest
+    container_name: soc-zeek
+    network_mode: host
+    cap_add:
+      - NET_ADMIN
+      - NET_RAW
+    mem_limit: 250m
+    volumes:
+      - ./zeek/logs:/usr/local/zeek/logs
+    command: zeek -i ${INTERFACE:-eth0} local
+    restart: unless-stopped
+
+  # ---- Live Traffic Dashboard ----
+  ntopng:
+    image: ntop/ntopng:latest
+    container_name: soc-ntopng
+    network_mode: host
+    cap_add:
+      - NET_ADMIN
+      - NET_RAW
+    mem_limit: 200m
+    command: -i ${INTERFACE:-eth0} -w 3000
+    restart: unless-stopped
