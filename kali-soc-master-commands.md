@@ -1,4 +1,5 @@
 # Complete SOC Management & Operations Command Handbook (Kali Linux)
+
 ### Class-by-Class Reference Manual (Classes 01 to 20)
 
 This master handbook provides practical, copy-paste ready Kali Linux commands, installation steps, flag breakdowns, and SOC analyst use-cases mapped directly to each session in the **SOC Management & Operations Course** (`class-list.md`).

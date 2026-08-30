@@ -1,0 +1,15 @@
+#separator \x09
+#set_separator	,
+#empty_field	(empty)
+#unset_field	-
+#path	conn
+#open	2026-08-30-19-00-00
+#fields	ts	uid	id.orig_h	id.orig_p	id.resp_h	id.resp_p	proto	service	duration	orig_bytes	resp_bytes	conn_state
+#types	time	string	addr	port	addr	port	enum	string	interval	count	count	string
+1756557600.000000	CqK1a1	10.0.0.5	49610	45.153.160.140	443	tcp	ssl	3600.114	512	644	SF
+1756561200.000000	CqK1a2	10.0.0.5	49712	45.153.160.140	443	tcp	ssl	3598.902	498	640	SF
+1756564800.000000	CqK1a3	10.0.0.5	49820	45.153.160.140	443	tcp	ssl	3601.331	530	651	SF
+1756557620.000000	Cbb200	10.0.0.5	52344	142.250.190.14	443	tcp	ssl	12.204	18422	230114	SF
+1756557900.000000	Cbb201	10.0.0.12	60122	10.0.0.10	445	tcp	-	0.084	1204	980	SF
+1756558200.000000	Cbb202	10.0.0.5	52360	140.82.113.3	443	tcp	ssl	44.900	90233	1201338	SF
+1756561800.000000	Cbb203	10.0.0.12	60130	193.169.255.78	8080	tcp	-	1802.552	402	410	SF

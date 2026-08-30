@@ -1,0 +1,27 @@
+THREAT INTELLIGENCE BULLETIN  (LAB / FICTITIOUS)
+================================================
+Actor cluster:  "TIN MAGPIE"      Report date: 2026-08-28
+Summary: Commodity loader delivered via invoice-themed phishing, followed by
+         long-interval HTTPS beaconing to attacker infrastructure.
+
+--- Network Indicators ---
+C2 IPv4:        45.153.160.140
+C2 IPv4:        193.169.255.78
+Staging host:   185.220.101.5
+C2 domain:      evil-c2[.]com
+Fallback:       update-check[.]net
+Payload URL:    hxxp://5.42.92.211/win/update.hta
+
+--- File Indicators ---
+MD5:            9f1c8d2e5b4a3c6f7e0d1a2b3c4d5e6f
+SHA256:         d41d8cd98f00b204e9800998ecf8427ee3b0c44298fc1c149afbf4c8996fb924
+Dropped file:   %TEMP%\invoice_2026.hta
+
+--- Exploited / referenced ---
+CVE-2024-3400   (initial access on edge appliance)
+CVE-2023-38831  (archive-based delivery)
+
+--- Recommended hunt ---
+1. Search web roots for PHP webshell primitives.
+2. Sweep archived logs for the C2 IPv4 list above.
+3. Review Zeek conn.log for long-duration low-byte sessions (beaconing).

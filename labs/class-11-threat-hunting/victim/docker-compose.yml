@@ -1,0 +1,40 @@
+# =====================================================================
+# Class 11 lab — VICTIM host  ("web01")
+# A deliberately soft target for the manual attack walkthrough.
+#   - DVWA        : vulnerable web app with a file-upload page  -> :8080
+#   - openssh     : weak creds for the brute-force stage        -> :2222
+# Shared volume 'webroot' is the uploads dir both containers see, so a
+# shell dropped through DVWA is reachable and huntable on disk.
+#
+#   docker compose up -d
+#   DVWA:  http://<victim-ip>:8080   (admin / password  -> "Create/Reset Database")
+#   SSH :  ssh support@<victim-ip> -p 2222   (password: support  / also: admin/admin123)
+#
+# RUN ONLY on an isolated host-only / internal lab network.
+# =====================================================================
+services:
+  dvwa:
+    image: vulnerables/web-dvwa:latest
+    container_name: web01-dvwa
+    ports:
+      - "8080:80"
+    volumes:
+      - webroot:/var/www/html/hackable/uploads
+    restart: unless-stopped
+
+  ssh:
+    image: lscr.io/linuxserver/openssh-server:latest
+    container_name: web01-ssh
+    environment:
+      - PASSWORD_ACCESS=true
+      - USER_NAME=support
+      - USER_PASSWORD=support
+      - SUDO_ACCESS=true
+    ports:
+      - "2222:2222"
+    volumes:
+      - webroot:/uploads
+    restart: unless-stopped
+
+volumes:
+  webroot:
