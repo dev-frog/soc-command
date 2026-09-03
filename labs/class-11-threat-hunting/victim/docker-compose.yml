@@ -6,9 +6,9 @@
 # Shared volume 'webroot' is the uploads dir both containers see, so a
 # shell dropped through DVWA is reachable and huntable on disk.
 #
-#   docker compose up -d
-#   DVWA:  http://<victim-ip>:8080   (admin / password  -> "Create/Reset Database")
-#   SSH :  ssh support@<victim-ip> -p 2222   (password: support  / also: admin/admin123)
+#   ./run.sh                 <- brings it up AND auto-configures DVWA
+#   DVWA:  http://<victim-ip>:8080   admin / password  (DB reset, security = Low)
+#   SSH :  ssh support@<victim-ip> -p 2222   password: support
 #
 # RUN ONLY on an isolated host-only / internal lab network.
 # =====================================================================

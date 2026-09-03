@@ -37,13 +37,15 @@ mkdir -p ~/engagements/class11 && cd ~/engagements/class11
 
 ```bash
 cd labs/class-11-threat-hunting/victim
-docker compose up -d
-# DVWA -> http://<victim>:8080  (admin/password -> "Create / Reset Database";
-#         DVWA Security tab -> set to "Low")
+./run.sh
+# DVWA -> http://<victim>:8080  (admin/password — DB reset + security = Low already done)
 # SSH  -> ssh support@<victim> -p 2222  (support/support)
 ```
 
-Metasploitable 2/3 or a VulnHub box work the same way — adjust ports.
+`./run.sh` brings both containers up and drives DVWA's `setup.php` / security page
+for you, so the upload vuln is live the moment it returns. Reset between runs with
+`./run.sh clean && ./run.sh`. Metasploitable 2/3 or a VulnHub box work the same way
+— adjust ports.
 
 ---
 
@@ -281,16 +283,19 @@ sudo sed -i '/45.153.160.140\|193.169.255.78/d' /var/log/auth.log   # tamper liv
 shred -u /tmp/.lp.txt /tmp/.job 2>/dev/null
 ```
 
-Then collect what a responder would pull and run the offline hunt:
+Then collect what a responder would pull and run the hunt against it:
 
 ```bash
-# Kali — pull victim evidence and hunt it with the lab's own hunt.sh layout
-mkdir -p work/var/log work/var/www work/zeek
-scp -P 2222 -i lab_key "support@$VICTIM:/var/log/*"          work/var/log/  2>/dev/null
-scp -P 2222 -i lab_key -r "support@$VICTIM:/var/www/html"    work/var/www/  2>/dev/null
-cp /path/to/zeek/logs/current/conn.log                      work/zeek/
-./hunt.sh
+# from labs/class-11-threat-hunting/ — pulls apache + sshd logs, your uploaded
+# shells, and any planted SUID / /dev/shm files off the live containers into ./work/
+./collect.sh
+./hunt.sh -s
 ```
+
+`collect.sh` builds the same `./work/` layout the offline `setup.sh` produces, so
+`hunt.sh` is unchanged — it is just now chasing artifacts you generated. If you
+attacked a non-Docker victim instead, `scp` its `/var/log/*` and `/var/www/html`
+into `./work/` in that layout and run `./hunt.sh` directly.
 
 ---
 

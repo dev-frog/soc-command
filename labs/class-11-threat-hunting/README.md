@@ -14,11 +14,12 @@ intel enrichment and detection engineering.
 
 | Path | Purpose |
 |------|---------|
-| `setup.sh` | Builds the scenario tree under `./work/` (static — artifacts pre-placed) |
-| `attack.sh` | Builds the same tree by *emulating the intrusion* stage by stage, each tagged with its MITRE ATT&CK technique (`--live` also fires real lab-scoped noise) |
-| `ATTACK-MANUAL.md` | Do the intrusion **for real** with Kali tools (`nmap`, `hydra`, `weevely`, `msfvenom`, Sliver…) against the victim in `victim/` |
-| `victim/docker-compose.yml` | Deliberately soft target — DVWA + weak-cred OpenSSH — for the manual walkthrough |
-| `hunt.sh` | Guided hunt — runs all six techniques with headers (`-s` to pause between steps) |
+| `victim/run.sh` | **Stand up the target you hack** — DVWA + weak-cred OpenSSH, auto-configured (DB reset, security = Low) so the upload vuln is live immediately |
+| `ATTACK-MANUAL.md` | Do the intrusion **for real** with Kali tools (`nmap`, `hydra`, `weevely`, `msfvenom`, Sliver…) against `victim/` |
+| `collect.sh` | Pull the **real** evidence off the box you just hacked (apache + sshd logs, your uploaded shells, planted SUID / `/dev/shm` files) into `./work/` |
+| `setup.sh` | Offline alternative — builds the `./work/` scenario tree statically (no containers) |
+| `attack.sh` | Offline alternative — builds the same tree by *emulating the intrusion* stage by stage, each tagged with its MITRE ATT&CK technique (`--live` also fires real lab-scoped noise) |
+| `hunt.sh` | Guided hunt — runs all six techniques with headers (`-s` to pause between steps), against whatever is in `./work/` |
 | `rules/hunt_webshell.yar` | YARA rule for PHP webshell primitives |
 | `scenario/` | Raw source data (webshell, IOC list, CTI report, Zeek `conn.log`, syslog) |
 
@@ -36,30 +37,43 @@ a beaconing session, a hidden SUID shell, and a downloader staged in `/dev/shm`.
 
 ## Quick start
 
+### Hosted mode — run it, hack it, hunt it (recommended)
+
 ```bash
 cd labs/class-11-threat-hunting
-chmod +x setup.sh attack.sh hunt.sh
+chmod +x victim/run.sh collect.sh hunt.sh
 
-# --- pick ONE way to stage the scenario ---
-./setup.sh          # A: static build (fast)
-./attack.sh         # B: watch the 8-stage intrusion happen (ATT&CK-tagged)
-./attack.sh --live  # B+: also scan localhost / GET testmyids.com / DNS / beacon
+./victim/run.sh          # 1. stand up web01 (DVWA + weak SSH), auto-configured
 
-# --- then hunt it ---
-./hunt.sh           # run the whole hunt
-./hunt.sh -s        # pause before each step (classroom pace)
+#  2. HACK IT — follow ATTACK-MANUAL.md (nmap / hydra / weevely / msfvenom …)
 
+./collect.sh             # 3. pull the victim's REAL logs + your shells into ./work/
+./hunt.sh -s             # 4. hunt the intrusion you just performed
+
+./victim/run.sh clean    # reset the target   (./collect.sh clean wipes ./work)
+```
+
+### Offline mode — no containers, canned scenario
+
+```bash
+chmod +x setup.sh attack.sh
+./setup.sh          # static build (fast)
+./attack.sh         # OR: watch the 8-stage intrusion happen (ATT&CK-tagged)
+./attack.sh --live  #     also scan localhost / GET testmyids.com / DNS / beacon
+./hunt.sh -s
 ./setup.sh clean    # tear down ./work  (or ./attack.sh clean)
 ```
 
-**Three ways to run it:**
-- `setup.sh` — static build, when you only want the hunt.
-- `attack.sh` — scripted 8-stage intrusion into `./work/` (offline, ATT&CK-tagged) so students see the compromise before hunting it.
-- `ATTACK-MANUAL.md` — the real thing: stand up `victim/` (DVWA + weak SSH) and run the intrusion by hand with Kali tools, then pull the victim's logs and hunt them.
+**Which to use:**
+- **Hosted** (`victim/run.sh` → `ATTACK-MANUAL.md` → `collect.sh`) — you break into a
+  real DVWA box with Kali tools, then hunt artifacts you actually generated.
+- **`setup.sh`** — static build, when you only want the hunt.
+- **`attack.sh`** — scripted offline intrusion into `./work/` so students see the
+  compromise narrated before hunting it.
 
-All three leave a huntable `./work/` (the manual one via `scp` of victim evidence).
-For attacking the *network* monitoring stack (Suricata/Zeek) with live traffic,
-see [`../adversary-emulation.md`](../adversary-emulation.md).
+All paths leave a huntable `./work/`; `hunt.sh` never changes. For attacking the
+*network* monitoring stack (Suricata/Zeek) with live traffic, see
+[`../adversary-emulation.md`](../adversary-emulation.md).
 
 ### Optional tools (the script falls back to `grep`/`awk`/regex if missing)
 
