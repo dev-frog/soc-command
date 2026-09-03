@@ -16,6 +16,8 @@ intel enrichment and detection engineering.
 |------|---------|
 | `victim/run.sh` | **Stand up the target you hack** — DVWA + weak-cred OpenSSH, auto-configured (DB reset, security = Low) so the upload vuln is live immediately |
 | `ATTACK-MANUAL.md` | Do the intrusion **for real** with Kali tools (`nmap`, `hydra`, `weevely`, `msfvenom`, Sliver…) against `victim/` |
+| `DETECTION-WALKTHROUGH.md` | Defender's mirror of `ATTACK-MANUAL.md` — for each of the 8 attack stages, the exact log line that proves it, where it lives, and the command that surfaces it (real captured samples) |
+| `SOC-INVESTIGATION-PLAYBOOK.md` | Blue-team lead's side — the 7-question set for deciding *"was web01 attacked?"*, the incident-call criteria, evidence handling, and an incident-report template |
 | `collect.sh` | Pull the **real** evidence off the box you just hacked (apache + sshd logs, your uploaded shells, planted SUID / `/dev/shm` files) into `./work/` |
 | `setup.sh` | Offline alternative — builds the `./work/` scenario tree statically (no containers) |
 | `attack.sh` | Offline alternative — builds the same tree by *emulating the intrusion* stage by stage, each tagged with its MITRE ATT&CK technique (`--live` also fires real lab-scoped noise) |
