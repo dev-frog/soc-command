@@ -13,6 +13,14 @@
 
 `suricata`, `zeek`, and `ntopng` run with `network_mode: host` and `NET_ADMIN`/`NET_RAW` capabilities so they can actually see live traffic on your NIC (Docker's default bridge network won't show you the host's real traffic).
 
+## Guided lab modules
+
+| Module | What it covers |
+| ------ | -------------- |
+| [`network-traffic-analysis/`](network-traffic-analysis/README.md) | 5-room TryHackMe-style module — packet basics, Wireshark (basics / packet operations / traffic analysis), NetworkMiner. Lab-first, with committed pcaps and an instructor answer key. |
+| [`class-11-threat-hunting/`](class-11-threat-hunting/README.md) | Hunt a compromised host: attack it for real, collect its logs, run six hunt techniques, pivot to threat intel. |
+| [`adversary-emulation.md`](adversary-emulation.md) | Drive attacks against the sensors below so detections/hunts have something to find. |
+
 ## Quick start
 
 ```bash
