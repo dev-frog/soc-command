@@ -8,7 +8,7 @@ This guide provides 20 essential commands and tools for automated compliance aud
 ### 1. `oscap` — OpenSCAP Automated Compliance Evaluation
 **Purpose:** Execute standardized XCCDF security profile audits against Linux systems and generate interactive HTML reports.
 ```bash
-sudo apt install -y libopenscap8 ssg-debian ssg-debderived
+sudo apt install -y openscap-common ssg-debian ssg-debderived
 oscap xccdf eval --profile xccdf_org.ssgproject.content_profile_cis \
   --results /tmp/cis_results.xml \
   --report /tmp/cis_compliance_report.html \
@@ -18,11 +18,12 @@ oscap xccdf eval --profile xccdf_org.ssgproject.content_profile_cis \
 ---
 
 ### 2. `lynis` (Compliance Mode) — ISO 27001 & PCI-DSS Auditing
-**Purpose:** Run automated system hardening and regulatory compliance audits against PCI-DSS and ISO 27001 standards.
+**Purpose:** Run automated system hardening audit; results map to ISO 27001 and PCI-DSS controls for manual compliance review.
 ```bash
 sudo apt install -y lynis
-sudo lynis audit system --compliance ISO27001,PCI-DSS --report-file /tmp/lynis_compliance.dat
+sudo lynis audit system --report-file /tmp/lynis_compliance.dat
 ```
+**Note:** The community edition of Lynis has no `--compliance` flag — automatic ISO 27001/PCI-DSS framework tagging is a Lynis Enterprise feature. The community report (`/tmp/lynis_compliance.dat` and `/var/log/lynis.log`) still lists every test performed, which can be cross-referenced against ISO 27001/PCI-DSS controls manually.
 
 ---
 
