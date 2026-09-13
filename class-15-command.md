@@ -10,7 +10,8 @@ This guide provides 20 essential commands and tools for encrypted backups (Resti
 ```bash
 sudo apt install -y restic
 # Initialize backup repo
-restic init --repo /backup/soc_dr_repo
+sudo mkdir -p /backup/soc_dr_repo
+sudo restic init --repo /backup/soc_dr_repo
 # Create snapshot of configs and rules
 sudo restic -r /backup/soc_dr_repo backup /etc/suricata /etc/elasticsearch /var/ossec/etc
 ```
@@ -92,8 +93,8 @@ sudo ip route replace default via 192.168.1.254 dev eth1
 
 ---
 
-### 11. `pg_dump` — Relational Database Backup (GVM / TheHive)
-**Purpose:** Export SQL database dumps of case management and vulnerability databases for offline DR storage.
+### 11. `pg_dump` — Relational Database Backup (GVM/OpenVAS)
+**Purpose:** Export SQL database dumps of the GVM/OpenVAS vulnerability management database for offline DR storage.
 ```bash
 sudo -u postgres pg_dump gvmd > /backup/gvmd_db_$(date +%F).sql
 ```
@@ -159,7 +160,10 @@ sudo fsck -f -y /dev/sdb1
 ### 19. `crontab` — Schedule Automated Daily DR Backup Verification
 **Purpose:** Schedule automated daily integrity checks of all disaster recovery repositories.
 ```bash
-echo "0 2 * * * root restic -r /backup/soc_dr_repo check" | sudo tee -a /etc/crontab
+# restic needs a non-interactive password source since cron has no TTY
+echo "your-repo-passphrase" | sudo tee /etc/restic-dr.pass >/dev/null
+sudo chmod 600 /etc/restic-dr.pass
+echo "0 2 * * * root restic -r /backup/soc_dr_repo --password-file /etc/restic-dr.pass check" | sudo tee -a /etc/crontab
 ```
 
 ---
@@ -167,8 +171,10 @@ echo "0 2 * * * root restic -r /backup/soc_dr_repo check" | sudo tee -a /etc/cro
 ### 20. `mailx` — Broadcast Crisis Communication Notifications
 **Purpose:** Send automated status updates to executive crisis management teams during outage restoration.
 ```bash
+sudo apt install -y bsd-mailx
 echo "Disaster Recovery Drill Completed: Secondary SIEM Cluster restored in 42 minutes." | mailx -s "CRISIS_UPDATE: Recovery Successful" crisis-team@organization.com
 ```
+**Note:** `mailx` only queues the message locally — it requires a configured MTA (e.g. `sudo apt install -y postfix` or `ssmtp`) to actually deliver mail. Without one, messages sit unsent in the local mail spool.
 
 ---
 *SOC Command Reference - Class 15*
